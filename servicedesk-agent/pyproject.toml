@@ -1,0 +1,46 @@
+# file: pyproject.toml
+[project]
+name = "servicedesk-agent"
+version = "0.1.0"
+description = "企业 IT 工单智能体（AI Agent 零基础到生产级 主线项目）"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "httpx>=0.28.1",
+    "langchain-mcp-adapters>=0.3.2",
+    "langgraph>=1.2.22",
+    "langgraph-checkpoint-sqlite>=3.1.3",
+    "pydantic>=2.9,<3.0",
+    "pydantic-settings>=2.5,<3.0",
+    "python-dotenv>=1.0,<2.0",
+    "qdrant-client>=1.20.0",
+    "ragas>=0.4.4",
+    "structlog>=26.1.0",
+]
+
+# 开发依赖：不进生产环境。uv run 默认会加载 dev 组
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<9.0",
+    "pytest-asyncio>=0.24,<2.0",
+    "ruff>=0.6,<1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# 关键一行：告诉打包工具，要装进环境的包在 src/servicedesk
+[tool.hatch.build.targets.wheel]
+packages = ["src/servicedesk"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]        # 让 tests 能 import scripts.* 这类项目内模块
+asyncio_mode = "auto"
+# 消掉 pytest-asyncio 的 DeprecationWarning，不是必须的
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

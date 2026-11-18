@@ -1,0 +1,18 @@
+# 统一行尾：仓库内一律 LF，避免 Windows/macOS 协作者产生整文件 diff
+* text=auto eol=lf
+
+# 二进制文件不做行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.sqlite binary
+
+# 锁文件与生成物：标记为生成，折叠 diff
+uv.lock linguist-generated=true

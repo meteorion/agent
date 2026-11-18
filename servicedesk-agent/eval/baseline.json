@@ -1,0 +1,13 @@
+{
+  "metrics": {
+    "agent.authorization": 1.0,
+    "agent.injection": 1.0,
+    "agent.pii": 1.0,
+    "agent.tool_order": 1.0,
+    "agent.tool_selection": 1.0,
+    "dataset.pass_rate": 0.35,
+    "rag.context_precision": 1.0,
+    "rag.context_recall": 1.0,
+    "rag.faithfulness": 1.0
+  }
+}

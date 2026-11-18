@@ -1,0 +1,631 @@
+{
+  "title": "2026 AI Agent 零基础到生产级开发实战教程",
+  "version": 1,
+  "stages": [
+    {
+      "stage": 1,
+      "dir": "01-foundation",
+      "name": "基建与破冰"
+    },
+    {
+      "stage": 2,
+      "dir": "02-protocol",
+      "name": "协议与工具链"
+    },
+    {
+      "stage": 3,
+      "dir": "03-graph",
+      "name": "生产级状态机编排"
+    },
+    {
+      "stage": 4,
+      "dir": "04-multi-agent",
+      "name": "多智能体与长程记忆"
+    },
+    {
+      "stage": 5,
+      "dir": "05-eval-ops",
+      "name": "评估、安全与上线"
+    }
+  ],
+  "sections": [
+    {
+      "id": "1.1",
+      "title": "从空目录建立可运行的工程骨架",
+      "stage": 1,
+      "file": "01-foundation/01-01-project-skeleton.md",
+      "depends_on": [],
+      "difficulty": 1,
+      "minutes": 45,
+      "milestone": "M1",
+      "verifies": "删掉 .venv 后一条 uv sync 能重建并跑通",
+      "produces": [
+        "pyproject.toml",
+        "src/servicedesk/config.py",
+        "src/servicedesk/__main__.py"
+      ]
+    },
+    {
+      "id": "1.2",
+      "title": "用「点餐叫号」理解 async：Agent 为什么必须异步",
+      "stage": 1,
+      "file": "01-foundation/01-02-async-model.md",
+      "depends_on": [
+        "1.1"
+      ],
+      "difficulty": 2,
+      "minutes": 75,
+      "milestone": "M1",
+      "verifies": "能解释「快 3 倍」的真实原因，并演示取消后任务确实停了",
+      "produces": [
+        "scripts/async_demo.py"
+      ]
+    },
+    {
+      "id": "1.3",
+      "title": "不借 SDK，亲手发一次 LLM 请求",
+      "stage": 1,
+      "file": "01-foundation/01-03-raw-llm-request.md",
+      "depends_on": [
+        "1.2"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M1",
+      "verifies": "能贴出流式输出，并算出单次调用真实费用",
+      "produces": [
+        "src/servicedesk/llm/raw_client.py"
+      ]
+    },
+    {
+      "id": "1.4",
+      "title": "用 pydantic v2 把一段文字变成结构化数据",
+      "stage": 1,
+      "file": "01-foundation/01-04-pydantic-structured-output.md",
+      "depends_on": [
+        "1.3"
+      ],
+      "difficulty": 2,
+      "minutes": 75,
+      "milestone": "M1",
+      "verifies": "喂多余字段/缺字段的 JSON，给出可读纠错而非崩溃",
+      "produces": [
+        "src/servicedesk/models/ticket.py"
+      ]
+    },
+    {
+      "id": "1.5",
+      "title": "给 LLM 客户端装上超时、重试与异常分层",
+      "stage": 1,
+      "file": "01-foundation/01-05-resilient-client.md",
+      "depends_on": [
+        "1.3"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M1",
+      "verifies": "断网与错 key 两种情形，分别看到「重试 3 次后报可读错误」和「立即失败」",
+      "produces": [
+        "src/servicedesk/llm/client.py"
+      ]
+    },
+    {
+      "id": "1.6",
+      "title": "基础 RAG（一）：把文档切成检索友好的块",
+      "stage": 1,
+      "file": "01-foundation/01-06-rag-splitting.md",
+      "depends_on": [
+        "1.4"
+      ],
+      "difficulty": 2,
+      "minutes": 75,
+      "milestone": "M1",
+      "verifies": "能指出某个 chunk 为什么会导致后续答非所问",
+      "produces": [
+        "src/servicedesk/rag/splitter.py"
+      ]
+    },
+    {
+      "id": "1.7",
+      "title": "基础 RAG（二）：embedding、向量库与检索",
+      "stage": 1,
+      "file": "01-foundation/01-07-rag-embedding-retrieval.md",
+      "depends_on": [
+        "1.6"
+      ],
+      "difficulty": 3,
+      "minutes": 100,
+      "milestone": "M1",
+      "verifies": "能演示「无 rerank vs 有 rerank」的 top-3 差异",
+      "produces": [
+        "src/servicedesk/rag/store.py"
+      ]
+    },
+    {
+      "id": "1.8",
+      "title": "基础 RAG（三）：拼 prompt、给引用、压幻觉（M1 验收）",
+      "stage": 1,
+      "file": "01-foundation/01-08-rag-prompt-citations.md",
+      "depends_on": [
+        "1.7"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M1",
+      "verifies": "问知识库里没有的问题，它明确说「查不到」而不是编",
+      "produces": [
+        "src/servicedesk/rag/answer.py",
+        "scripts/ask.py"
+      ]
+    },
+    {
+      "id": "2.1",
+      "title": "用 Function Calling 让模型自己选工具",
+      "stage": 2,
+      "file": "02-protocol/02-01-function-calling.md",
+      "depends_on": [
+        "1.5"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M2",
+      "verifies": "模型能在一句话里正确挑出 2 个工具并列调用",
+      "produces": [
+        "src/servicedesk/tools/registry.py"
+      ]
+    },
+    {
+      "id": "2.2",
+      "title": "为什么需要 MCP：从 N×M 集成地狱到统一协议",
+      "stage": 2,
+      "file": "02-protocol/02-02-why-mcp.md",
+      "depends_on": [
+        "2.1"
+      ],
+      "difficulty": 1,
+      "minutes": 45,
+      "milestone": "M2",
+      "verifies": "对 3 个业务场景判断该不该 MCP 化并给出理由",
+      "produces": [
+        "docs/mcp-notes.md"
+      ]
+    },
+    {
+      "id": "2.3",
+      "title": "2026-07-28 无状态改造：握手与 Session 去了哪",
+      "stage": 2,
+      "file": "02-protocol/02-03-mcp-stateless-migration.md",
+      "depends_on": [
+        "2.2"
+      ],
+      "difficulty": 4,
+      "minutes": 90,
+      "milestone": "M2",
+      "verifies": "能对着时序图讲出「为什么这版能在 Serverless 上冷启动」",
+      "produces": [
+        "docs/mcp-stateless.md"
+      ]
+    },
+    {
+      "id": "2.4",
+      "title": "用 server/discover + 三原语写第一个无状态 MCP Server",
+      "stage": 2,
+      "file": "02-protocol/02-04-mcp-server-discover.md",
+      "depends_on": [
+        "2.3"
+      ],
+      "difficulty": 4,
+      "minutes": 120,
+      "milestone": "M2",
+      "verifies": "用 MCP Inspector 连上能看到 discover 结果与 3 个工具",
+      "produces": [
+        "mcp/server.py"
+      ]
+    },
+    {
+      "id": "2.5",
+      "title": "Streamable HTTP + subscriptions/listen 上 Serverless",
+      "stage": 2,
+      "file": "02-protocol/02-05-mcp-streamable-http.md",
+      "depends_on": [
+        "2.4"
+      ],
+      "difficulty": 5,
+      "minutes": 120,
+      "milestone": "M2",
+      "verifies": "两个并发请求打到不同实例，工具调用都成功且互不影响",
+      "produces": [
+        "mcp/http_app.py",
+        "Dockerfile"
+      ]
+    },
+    {
+      "id": "2.6",
+      "title": "用 MRTR + OAuth 2.0 处理「缺信息」与「缺权限」",
+      "stage": 2,
+      "file": "02-protocol/02-06-mcp-mrtr-oauth.md",
+      "depends_on": [
+        "2.5"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M2",
+      "verifies": "演示「工具说缺审批人 → 补上后重试成功」的完整往返",
+      "produces": [
+        "mcp/auth.py",
+        "scripts/mrtr_client.py"
+      ]
+    },
+    {
+      "id": "2.7",
+      "title": "用 langchain-mcp-adapters 把 MCP 工具接进 Agent（M2 验收）",
+      "stage": 2,
+      "file": "02-protocol/02-07-mcp-adapters-bridge.md",
+      "depends_on": [
+        "2.6"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M2",
+      "verifies": "一次回答里串起「查资产 → 查权限 → 给结论」三个 MCP 工具",
+      "produces": [
+        "graph/tools_bridge.py"
+      ]
+    },
+    {
+      "id": "3.1",
+      "title": "从「一长串 if」到状态图：为什么需要 LangGraph",
+      "stage": 3,
+      "file": "03-graph/03-01-from-if-to-graph.md",
+      "depends_on": [
+        "2.7"
+      ],
+      "difficulty": 2,
+      "minutes": 75,
+      "milestone": "M3",
+      "verifies": "能画出自己业务的一张状态图并标出所有分支",
+      "produces": [
+        "src/servicedesk/graph/minimal.py"
+      ]
+    },
+    {
+      "id": "3.2",
+      "title": "设计 State：什么才是「真状态」",
+      "stage": 3,
+      "file": "03-graph/03-02-graph-state-design.md",
+      "depends_on": [
+        "3.1"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M3",
+      "verifies": "能解释 messages 为何必须用追加 reducer，改错后复现消息丢失",
+      "produces": [
+        "src/servicedesk/graph/state.py"
+      ]
+    },
+    {
+      "id": "3.3",
+      "title": "条件边与循环：让图会「回头看」",
+      "stage": 3,
+      "file": "03-graph/03-03-conditional-edges-loops.md",
+      "depends_on": [
+        "3.2"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M3",
+      "verifies": "构造「信息不足 → 回检索」循环且不会无限转",
+      "produces": [
+        "src/servicedesk/graph/edges.py"
+      ]
+    },
+    {
+      "id": "3.4",
+      "title": "用 Checkpointer 实现「杀进程后断点续跑」",
+      "stage": 3,
+      "file": "03-graph/03-04-checkpointer-resume.md",
+      "depends_on": [
+        "3.3"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M3",
+      "verifies": "杀进程重启能从 3.3 中途节点继续且结果一致",
+      "produces": [
+        "src/servicedesk/graph/checkpoint.py"
+      ]
+    },
+    {
+      "id": "3.5",
+      "title": "用 interrupt() 做人工审批门禁",
+      "stage": 3,
+      "file": "03-graph/03-05-human-approval-interrupt.md",
+      "depends_on": [
+        "3.4"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M3",
+      "verifies": "演示拒绝后走降级路径，重复恢复同一 thread 不重复执行副作用",
+      "produces": [
+        "src/servicedesk/graph/approval.py"
+      ]
+    },
+    {
+      "id": "3.6",
+      "title": "流式输出与可观测：把「图在干嘛」讲给用户",
+      "stage": 3,
+      "file": "03-graph/03-06-streaming-tracing.md",
+      "depends_on": [
+        "3.5"
+      ],
+      "difficulty": 3,
+      "minutes": 80,
+      "milestone": "M3",
+      "verifies": "能看到「检索中→调工具→等审批」的正确顺序",
+      "produces": [
+        "src/servicedesk/graph/streaming.py"
+      ]
+    },
+    {
+      "id": "3.7",
+      "title": "子图拆分与 M3 端到端验收",
+      "stage": 3,
+      "file": "03-graph/03-07-subgraph-main-graph.md",
+      "depends_on": [
+        "3.6"
+      ],
+      "difficulty": 4,
+      "minutes": 110,
+      "milestone": "M3",
+      "verifies": "三用例全过，且中断-恢复在需审批用例上成立",
+      "produces": [
+        "src/servicedesk/graph/main_graph.py"
+      ]
+    },
+    {
+      "id": "4.1",
+      "title": "先别急着多 Agent：什么时候单图就够",
+      "stage": 4,
+      "file": "04-multi-agent/04-01-multi-agent-decision.md",
+      "depends_on": [
+        "3.7"
+      ],
+      "difficulty": 2,
+      "minutes": 60,
+      "milestone": "M4",
+      "verifies": "能用判据说服自己某个需求「不该」上多 Agent",
+      "produces": [
+        "docs/multi-agent-decision.md"
+      ]
+    },
+    {
+      "id": "4.2",
+      "title": "用 A2A 协议做跨 Agent 协作",
+      "stage": 4,
+      "file": "04-multi-agent/04-02-a2a-protocol.md",
+      "depends_on": [
+        "4.1"
+      ],
+      "difficulty": 4,
+      "minutes": 110,
+      "milestone": "M4",
+      "verifies": "两个独立进程的 Agent 通过 A2A 完成一次任务委派",
+      "produces": [
+        "src/servicedesk/a2a/server.py"
+      ]
+    },
+    {
+      "id": "4.3",
+      "title": "Supervisor 与 Handoff：两种多 Agent 拓扑",
+      "stage": 4,
+      "file": "04-multi-agent/04-03-supervisor-handoff.md",
+      "depends_on": [
+        "4.2"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M4",
+      "verifies": "同一需求给出两种拓扑代码并说出取舍",
+      "produces": [
+        "src/servicedesk/graph/supervisor.py"
+      ]
+    },
+    {
+      "id": "4.4",
+      "title": "双层记忆（一）：短期会话与压缩",
+      "stage": 4,
+      "file": "04-multi-agent/04-04-short-term-memory.md",
+      "depends_on": [
+        "3.7"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M4",
+      "verifies": "30 轮对话压进窗口，仍答得出第 2 轮的关键事实",
+      "produces": [
+        "src/servicedesk/memory/short_term.py"
+      ]
+    },
+    {
+      "id": "4.5",
+      "title": "双层记忆（二）：长期语义 + 情景记忆与遗忘",
+      "stage": 4,
+      "file": "04-multi-agent/04-05-long-term-memory.md",
+      "depends_on": [
+        "4.4"
+      ],
+      "difficulty": 4,
+      "minutes": 110,
+      "milestone": "M4",
+      "verifies": "第二次会话主动想起上次偏好，且能删掉一条错误记忆",
+      "produces": [
+        "src/servicedesk/memory/long_term.py"
+      ]
+    },
+    {
+      "id": "4.6",
+      "title": "上下文污染的根因与四种解法",
+      "stage": 4,
+      "file": "04-multi-agent/04-06-context-pollution.md",
+      "depends_on": [
+        "4.5"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M4",
+      "verifies": "构造污染并证明隔离方案把指标拉回来",
+      "produces": [
+        "scripts/context_pollution_demo.py"
+      ]
+    },
+    {
+      "id": "4.7",
+      "title": "长对话压测与 M4 验收",
+      "stage": 4,
+      "file": "04-multi-agent/04-07-soak-test.md",
+      "depends_on": [
+        "4.6"
+      ],
+      "difficulty": 4,
+      "minutes": 80,
+      "milestone": "M4",
+      "verifies": "报告能指出第几轮开始崩、崩在哪个环节",
+      "produces": [
+        "scripts/soak_test.py",
+        "docs/M4-report.md"
+      ]
+    },
+    {
+      "id": "5.1",
+      "title": "先建评测集：没有 golden set 就没有工程",
+      "stage": 5,
+      "file": "05-eval-ops/05-01-eval-dataset.md",
+      "depends_on": [
+        "4.7"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M5",
+      "verifies": "能说明每条样本「为什么必须存在」",
+      "produces": [
+        "eval/dataset.jsonl"
+      ]
+    },
+    {
+      "id": "5.2",
+      "title": "用 RAGAS 给 RAG 打分并定位病根",
+      "stage": 5,
+      "file": "05-eval-ops/05-02-ragas-eval.md",
+      "depends_on": [
+        "5.1"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M5",
+      "verifies": "只改检索就把 Context Recall 拉高并给出前后数字",
+      "produces": [
+        "eval/ragas_eval.py"
+      ]
+    },
+    {
+      "id": "5.3",
+      "title": "用 DeepEval 评测 Agent 行为与安全",
+      "stage": 5,
+      "file": "05-eval-ops/05-03-deepeval-agent.md",
+      "depends_on": [
+        "5.2"
+      ],
+      "difficulty": 4,
+      "minutes": 110,
+      "milestone": "M5",
+      "verifies": "给出指标基线表并指出最差的一类样本",
+      "produces": [
+        "eval/deepeval_agent.py"
+      ]
+    },
+    {
+      "id": "5.4",
+      "title": "把评估接进 CI：指标回退就让流水线变红",
+      "stage": 5,
+      "file": "05-eval-ops/05-04-deepeval-ci-gate.md",
+      "depends_on": [
+        "5.3"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M5",
+      "verifies": "删掉一句 system prompt，CI 必须红并指出掉了哪个指标",
+      "produces": [
+        ".github/workflows/eval.yml",
+        "eval/test_gate.py"
+      ]
+    },
+    {
+      "id": "5.5",
+      "title": "用 W3C traceparent 串起全链路",
+      "stage": 5,
+      "file": "05-eval-ops/05-05-w3c-tracing.md",
+      "depends_on": [
+        "5.4"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M5",
+      "verifies": "能凭 trace id 说出每个环节耗时",
+      "produces": [
+        "src/servicedesk/observability/tracing.py"
+      ]
+    },
+    {
+      "id": "5.6",
+      "title": "护栏：输入输出双向拦截",
+      "stage": 5,
+      "file": "05-eval-ops/05-06-guardrails.md",
+      "depends_on": [
+        "5.5"
+      ],
+      "difficulty": 4,
+      "minutes": 100,
+      "milestone": "M5",
+      "verifies": "五条攻击样例被拦，正常样例不被误拦",
+      "produces": [
+        "src/servicedesk/guardrails/pipeline.py"
+      ]
+    },
+    {
+      "id": "5.7",
+      "title": "熔断、降级、限流与成本闸",
+      "stage": 5,
+      "file": "05-eval-ops/05-07-circuit-breaker.md",
+      "depends_on": [
+        "5.6"
+      ],
+      "difficulty": 4,
+      "minutes": 110,
+      "milestone": "M5",
+      "verifies": "模拟 LLM 全挂，系统仍给可用降级答复且不雪崩",
+      "produces": [
+        "src/servicedesk/resilience/circuit.py"
+      ]
+    },
+    {
+      "id": "5.8",
+      "title": "上线检查单与 M5 验收",
+      "stage": 5,
+      "file": "05-eval-ops/05-08-launch-checklist.md",
+      "depends_on": [
+        "5.7"
+      ],
+      "difficulty": 3,
+      "minutes": 90,
+      "milestone": "M5",
+      "verifies": "按 runbook 能在 15 分钟内完成一次回滚",
+      "produces": [
+        "docs/runbook.md",
+        "docs/M5-report.md"
+      ]
+    }
+  ]
+}

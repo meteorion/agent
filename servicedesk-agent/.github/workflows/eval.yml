@@ -1,0 +1,44 @@
+﻿name: eval
+
+# 5.4：把 5.1–5.3 的评测接进 CI。
+# 任何指标回退 → 退出码非 0 → PR 不能合并。
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONIOENCODING: utf-8
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: true
+
+      - name: 安装依赖
+        run: uv sync --frozen
+
+      - name: 单元测试（先保证代码本身没坏）
+        run: uv run pytest -q
+
+      - name: 评测门禁（指标回退就让流水线变红）
+        run: uv run python -m servicedesk.eval.ci_gate --baseline eval/baseline.json
+
+      - name: 归档评测报告（红了也要能看）
+        if: always()
+        run: |
+          uv run python -m servicedesk.eval.ci_gate \
+            --baseline eval/baseline.json --json > eval-report.json || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: eval-report.json
+          if-no-files-found: warn
